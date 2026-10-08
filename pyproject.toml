@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bsp4py"
+version = "0.1.0"
+description = "Bulk Synchronous Parallel (BSP) programming for Python in the style of BSML: sequential simulator, multi-process and MPI backends, multi-level machines and cost model"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "LGPL-2.1" }
+authors = [{ name = "The bsp4py contributors" }]
+keywords = ["BSP", "bulk synchronous parallel", "BSML", "SGL", "multi-BSP", "parallel programming", "MPI", "functional programming"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: System :: Distributed Computing",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+mpi = ["mpi4py>=3.1", "cloudpickle>=2"]
+closures = ["cloudpickle>=2"]
+test = ["pytest>=7"]
+
+[project.scripts]
+bsp4py = "bsp4py.run:main"
+
+[project.urls]
+"Original BSML (OCaml)" = "https://bsml-lang.github.io"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+bsp4py = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["single: test that does not depend on the number of processors, run once"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E731", "E741"]  # lambdas and the BSP parameter "l" are part of the vocabulary
+
+[tool.ruff.lint.per-file-ignores]
+# mkpar evaluates its argument at once, closing over a loop variable is safe
+"tests/*" = ["B023"]
+"src/bsp4py/__init__.py" = ["F403"]

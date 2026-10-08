@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  # simulator and local processes: no dependency, every system
+  tests:
+    runs-on: ${{ matrix.os }}
+    env:
+      # if a process crashes, Python says where
+      PYTHONFAULTHANDLER: "1"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install the package
+        run: python -m pip install -e ".[test]" cloudpickle numpy
+      - name: Tests (simulator, and runs on local processes started by the tests)
+        run: python -m pytest
+      - name: Tests on local processes
+        run: python -m bsp4py.run -n 4 -m pytest -p no:cacheprovider
